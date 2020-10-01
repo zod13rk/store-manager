@@ -18,7 +18,7 @@ const initData = columns.map(col => ({
   name: col.selector
 }))
 
-export default function AccountsList ({ onSelect, preSelected }) {
+export default function AccountsList ({ onSelect, preSelected, singleSelect }) {
   const data = useSelector(selectAccounts)
   return (
     <Table
@@ -29,6 +29,7 @@ export default function AccountsList ({ onSelect, preSelected }) {
       actions={wrapDispatcher(accounts, useDispatch())}
       onSelect={onSelect}
       preSelected={preSelected}
+      singleSelect={singleSelect}
     />
   )
 }

@@ -1,7 +1,12 @@
 import React from 'react'
 import Tab from './component/Tab'
-import AccountsList from './features/lists/Accounts'
+
 import StoresList from './features/lists/Stores'
+import AccountsList from './features/lists/Accounts'
+import StuffsList from './features/lists/Stuffs'
+import CompaniesList from './features/lists/Companies'
+import ShipmentsList from './features/lists/Shipments'
+import PaymentsList from './features/lists/Payments'
 
 import { mainNavs } from './app/navs'
 import './App.css'
@@ -13,11 +18,11 @@ import './App.css'
 
 const contents = [
   <StoresList key='0' />,
-  <AccountsList key='1' />
-  // StuffsList,
-  // CompaniesList,
-  // ShipmentsList,
-  // PaymentsList,
+  <AccountsList key='1' />,
+  <StuffsList key='2' />,
+  <CompaniesList key='3' />,
+  <ShipmentsList key='4' />,
+  <PaymentsList key='5' />
 ]
 export default function app () {
   return (

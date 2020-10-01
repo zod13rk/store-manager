@@ -1,7 +1,8 @@
+import { PersistGate } from 'redux-persist/integration/react'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
-import store from './app/store'
+import storage from './app/store'
 import { Provider } from 'react-redux'
 import * as serviceWorker from './serviceWorker'
 import { create } from 'jss'
@@ -9,13 +10,16 @@ import rtl from 'jss-rtl'
 import { StylesProvider, jssPreset } from '@material-ui/core/styles'
 
 const jss = create({ plugins: [...jssPreset().plugins, rtl()] })
+const { store, persistor } = storage()
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <StylesProvider jss={jss}>
-        <App />
-      </StylesProvider>
+      <PersistGate loading={null} persistor={persistor}>
+        <StylesProvider jss={jss}>
+          <App />
+        </StylesProvider>
+      </PersistGate>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')

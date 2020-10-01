@@ -12,6 +12,9 @@ const listNames = [
 const normalize = {
   stores (value) {
     return { ...value, staffs: value.staffs.map(staff => staff.id) }
+  },
+  shipments (value) {
+    return { ...value, stuffs: value.stuffs.map(({ stuffId, amount }) => ({ id: stuffId, amount })) }
   }
 }
 export const lists = createSlice({
@@ -24,6 +27,7 @@ export const lists = createSlice({
     add (state, action) {
       const { listName, value } = action.payload
       value.id = genId()
+      value.regDate = new Date()
       const set = normalize[listName]
       state[listName][value.id] = (set && set(value)) || value
     },

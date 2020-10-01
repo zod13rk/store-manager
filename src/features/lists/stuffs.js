@@ -1,33 +1,57 @@
-import React from 'react';
-import MaterialTable from 'material-table';
-import {stuffs, selectStuffs} from './listsSlice'
-import { useSelector} from 'react-redux'
+import React from 'react'
+import { defGet, stuffs, selectStuffs } from './listsSlice'
+import Table from '../../component/Table'
+import { useDispatch, useSelector } from 'react-redux'
 import { wrapDispatcher } from '../../app/utils'
+import Companies from './Companies'
+import { List, ListItem } from '@material-ui/core'
 
-const title = "اجناس"
+const title = 'اجناس'
 
 const columns = [
-	{title: 'نام', field:'name'},
-	{title: 'فی خرید', field:'cost'},
-	{title: 'فی فروش', field:'price'},
-	{title: 'شرکت', field:'company'},
-	{title: 'تولید', field:'proDate', type:'Date'},
-	{title: 'انقضا', field:'proDate', type:'Date'},
+  { name: 'نام', selector: 'name', sortable: true },
+  { name: 'فی خرید', selector: 'cost', sortable: true },
+  { name: 'فی فروش', selector: 'price', sortable: true },
+  {
+    name: 'شرکت',
+    selector: 'companies',
+    cell: (row) => (
+      <List>
+        {row.companies.map((s, i) => (
+          <ListItem key={i}>
+            {s.fName} {s.lName}
+          </ListItem>
+        ))}
+      </List>
+    )
+  },
+  { name: 'تولید', selector: 'proDate', type: 'Date', sortable: true },
+  { name: 'انقضا', selector: 'proDate', type: 'Date', sortable: true }
 ]
-export default function StuffsList() {
-	const data = useSelector(selectStuffs)
-	const {add, remove, update} = wrapDispatcher(stuffs);
-	return (
-		<MaterialTable
-		title={title}
-		columns={columns}
-		data={data}
-		editable={{
-		onRowAdd: (newData) => add(newData),
-		onRowUpdate: (newData, oldData) => update({data:newData, id:oldData.id}),
-		onRowDelete: (oldData) => remove(oldData.id)
-	}}
-	/>
-	)
-}
 
+const initData = columns.map((col) => ({
+  label: col.name,
+  name: col.selector,
+  map: col.cell
+}))
+
+initData[3].value = [] //  شرکت
+initData[3].table = (value, onChange) => (
+  <Companies preSelected={value} onSelect={onChange} singleSelect />
+)
+
+export default function AccountsList ({ onSelect, preSelected, singleSelect }) {
+  const data = useSelector(selectStuffs)
+  return (
+    <Table
+      title={title}
+      columns={columns}
+      initData={initData}
+      data={defGet(data)}
+      actions={wrapDispatcher(stuffs, useDispatch())}
+      onSelect={onSelect}
+      preSelected={preSelected}
+      singleSelect={singleSelect}
+    />
+  )
+}

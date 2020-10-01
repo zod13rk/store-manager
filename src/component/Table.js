@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Dialog, DialogContent, DialogTitle } from '@material-ui/core'
+import { Button, Dialog, DialogContent, DialogTitle, Radio, Checkbox } from '@material-ui/core'
 import DataTable from 'react-data-table-component'
 import IconButton from '@material-ui/core/IconButton'
 import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck'
@@ -31,6 +31,10 @@ const removeColmun = remove => ({
     </Button>
   )
 })
+const dateColumn = {
+  name: 'تاریخ ثبت',
+  cell: row => ((typeof row.regDate === 'string') ? (new Date(row.regDate)) : row.regDate).toLocaleDateString('fa')
+}
 
 export default function TableData ({
   title,
@@ -39,12 +43,16 @@ export default function TableData ({
   actions,
   data,
   onSelect,
-  preSelected
+  preSelected,
+  singleSelect,
+  noDate
 }) {
   const { add, remove, update } = actions
   const [openAddForm, setOpenAddForm] = useState(false)
   const [openEditForm, setOpenEditForm] = useState(false)
   const [selectedRow, setSelectedRow] = useState({})
+  const [selectedRows, setSelcetedRows] = useState(preSelected || [])
+  !noDate && (columns = columns.concat([dateColumn]))
   columns = columns.concat([
     editColmun(setOpenEditForm, openEditForm, setSelectedRow),
     removeColmun(remove)
@@ -72,8 +80,18 @@ export default function TableData ({
         noDataComponent='لطفا آیتمی را اضافه کنید !!'
         contextMessage={{ singular: 'مورد', plural: 'مورد', message: 'انتخاب شد' }}
         selectableRows={!!onSelect}
-        onSelectedRowsChange={({ selectedRows }) => onSelect(selectedRows)}
-        selectableRowSelected={preSelected && (row => preSelected.some(({ id }) => id === row.id))}
+        onSelectedRowsChange={({ selectedRows: rows }) => {
+          if (singleSelect) {
+            console.log(rows)
+            const row0 = rows[0]
+            const rs = row0 ? [row0] : []
+            setSelcetedRows(rs)
+            onSelect(rs)
+          } else onSelect(rows)
+        }}
+        selectableRowSelected={(selectedRows.length > 0) && (row => selectedRows.some(({ id }) => id === row.id))}
+        selectableRowsComponent={singleSelect ? Radio : Checkbox}
+        selectableRowsNoSelectAll
       />
       <Dialog fullWidth maxWidth='md' onClose={() => setOpenAddForm(false)} open={openAddForm}>
         <DialogTitle divider>اضافه کردن آیتم جدید</DialogTitle>
@@ -91,7 +109,7 @@ export default function TableData ({
         <DialogContent dividers>
           <Form
             initData={initData.map(d => ({ ...d, value: selectedRow[d.name] }))}
-            submit={vals => update({ id: selectedRow.id, ...vals })}
+            submit={vals => update({ ...vals, id: selectedRow.id, regDate: selectedRow.regDate })}
             actionName='تغییر'
             cancel={() => setOpenEditForm(false)}
           />
